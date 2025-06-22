@@ -1,0 +1,82 @@
+﻿@model EventEase.ViewModels.SearchViewModel
+
+
+<h1>Search Booking</h1>
+<h4>Enter search data to search</h4>
+
+<form asp-action="CheckAvailability" method="get" class="form-inline mb-4 d-flex justify-content-center">
+    <input type="text" name="SearchEventName" class="form-control mr-2" placeholder="Event Name" />
+    <input type="number" name="SearchBookingId" class="form-control mr-2" placeholder="Booking ID" />
+
+    <input type="date" name="StartDate" class="form-control mr-2" placeholder="Start Date" required />
+    <input type="date" name="EndDate" class="form-control mr-2" placeholder="End Date" required />
+
+    <button type="submit" class="btn btn-sm search-button">
+        Check Availability
+    </button>
+</form>
+
+
+@if (Model.Bookings != null && Model.Bookings.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Booking Id
+                </th>
+                <th>
+                    Event Name
+                </th>
+                <th>
+                    Event Type
+                </th>
+                <th>
+                    Event Date
+                </th>
+                <th>
+                    Venue Name
+                </th>
+                <th>
+                    Venue Location
+                </th>
+                <th>
+                    Booking Date
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var booking in Model.Bookings)
+            {
+                <tr>
+                    <td>
+                        @booking.BookingId
+                    </td>
+                    <td>
+                        @booking.Event?.EventName
+                    </td>
+                    <td>
+                        @booking.Event?.EventType.EventTypeName
+                    </td>
+                    <td>
+                        @booking.Venue?.VenueName
+                    </td>
+                    <td>
+                        @booking.Venue?.Location
+                    </td>
+                    <td>
+                        @booking.StartDate.ToString("dd-MM-yyyy")
+                    </td>
+                    <td>
+                        @booking.EndDate.ToString("dd-MM-yyyy")
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p class="text-danger"> Cant find data</p>
+}

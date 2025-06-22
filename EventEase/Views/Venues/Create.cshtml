@@ -1,0 +1,88 @@
+﻿@model EventEase.Models.Venue
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Venue</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="VenueName" class="control-label"></label>
+                <input asp-for="VenueName" class="form-control" />
+                <span asp-validation-for="VenueName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Location" class="control-label"></label>
+                <input asp-for="Location" class="form-control" />
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Capacity" class="control-label"></label>
+                <input asp-for="Capacity" class="form-control" />
+                <span asp-validation-for="Capacity" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <div>
+                    @Html.LabelFor(m => m.ImageURL, new { @class = "form-label" })
+
+                </div>
+                <div>
+
+                    @Html.EditorFor(m => m.File, new { @class = "form-control" })
+                </div>
+            </div>
+
+            @* <div class="form-group">
+                @using (Html.BeginForm("Create", "Venues", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        <div>
+                            @Html.LabelFor(m => m.FileDetails, new { @class = "form-label" })
+                        </div>
+                        <div>
+                            @Html.EditorFor(m => m.File, new { @class = "form-control" })
+                        </div>
+					</div>
+
+                }
+
+                @if (!string.IsNullOrEmpty(Model?.ImageURL))
+                {
+                    <div class="mt-4">
+                        <h4>Uploaded Image:</h4>
+                        <img src="@Model.ImageURL" alt="Uploaded Image" class="img-fluid" style="max-height: 300px;" />
+                    </div>
+                    <div>
+                        <h8><a href>@Model.ImageURL</a></h8>
+                    </div>
+                }*@
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+
+
+
+<div>
+    <form asp-action="Index">
+        <button class="btn btn-primary" type="submit">Back to List</button>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

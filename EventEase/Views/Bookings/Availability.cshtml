@@ -1,0 +1,28 @@
+﻿@model List<EventEase.Models.Venue>
+
+<h1>Available Venues</h1>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Venue Name</th>
+                <th>Location</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var venue in Model)
+            {
+                <tr>
+                    <td>@venue.VenueName</td>
+                    <td>@venue.Location</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p class="text-danger">No venues available for the selected criteria.</p>
+}
