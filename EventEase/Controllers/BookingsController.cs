@@ -31,7 +31,7 @@ namespace EventEase.Controllers
             return View(await bookings.ToListAsync());
         }
 
-        public async Task<IActionResult> CheckAvailability(string? searchEventName, int? searchBookingId, DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> CheckAvailability(string? searchEventName, int? searchBookingId, int? searchEventTypeId, DateTime startDate, DateTime endDate)
         {
             // Query to find venues that do not have bookings in the specified date range
             var availableVenues = await _context.Venue
@@ -41,17 +41,39 @@ namespace EventEase.Controllers
                      (endDate >= b.StartDate && endDate <= b.EndDate) ||
                      (startDate <= b.StartDate && endDate >= b.EndDate))))
                 .ToListAsync();
-            // Filter available venues based on event name and booking ID if provided
+
+            // Filter based on event name if provided
             if (!string.IsNullOrEmpty(searchEventName))
             {
                 availableVenues = availableVenues.Where(v => v.Bookings.Any(b => b.Event.EventName.Contains(searchEventName))).ToList();
             }
+
+            // Filter based on event name if provided
             if (searchBookingId.HasValue)
             {
                 availableVenues = availableVenues.Where(v => v.Bookings.Any(b => b.BookingId == searchBookingId.Value)).ToList();
             }
-            return View(availableVenues);
+
+            // Filter based on event type if provided
+            if (searchEventTypeId.HasValue)
+            {
+                availableVenues = availableVenues.Where(v => v.Bookings.Any(b => b.Event.EventTypeID == searchEventTypeId.Value)).ToList();
+            }
+
+            var model = new SearchViewModel
+            {
+                Bookings = availableVenues.SelectMany(v => v.Bookings).ToList(),
+                EventTypes = await _context.EventType.ToListAsync(),
+                SearchEventName = searchEventName,
+                SearchBookingId = searchBookingId,
+                SearchEventType = searchEventTypeId,
+                StartDate = startDate,
+                EndDate = endDate
+            };
+
+            return View(model);
         }
+
 
         // GET: Bookings/Details/5
         public async Task<IActionResult> Details(int? id)

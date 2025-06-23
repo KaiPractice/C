@@ -104,6 +104,7 @@ namespace EventEase.Controllers
         // POST: Venues/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Venues/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("VenueID,VenueName,Location,Capacity,ImageURL,File")] Venue venue)
@@ -117,20 +118,21 @@ namespace EventEase.Controllers
             {
                 try
                 {
-                    if (venue.File == null)
+                    if (venue.File != null)
                     {
-                        ModelState.AddModelError("Error", "Image is required");
-                    }
+                        // Delete the old image from Azure Blob Storage
+                        if (!string.IsNullOrEmpty(venue.ImageURL))
+                        {
+                            _imageService.DeleteImageFromAzure(venue.ImageURL);
+                        }
 
-                    else
-                    {
+                        // Upload the new image
                         var imageUrl = _imageService.UploadImageToAzure(venue.File);
                         venue.ImageURL = imageUrl;
                     }
 
                     _context.Update(venue);
                     await _context.SaveChangesAsync();
-
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -148,6 +150,7 @@ namespace EventEase.Controllers
             }
             return View(venue);
         }
+
 
         // GET: Venues/Delete/5
         public async Task<IActionResult> Delete(int? id)

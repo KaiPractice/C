@@ -1,16 +1,20 @@
 ﻿@model EventEase.ViewModels.SearchViewModel
 
-
 <h1>Search Booking</h1>
 <h4>Enter search data to search</h4>
 
 <form asp-action="CheckAvailability" method="get" class="form-inline mb-4 d-flex justify-content-center">
     <input type="text" name="SearchEventName" class="form-control mr-2" placeholder="Event Name" />
     <input type="number" name="SearchBookingId" class="form-control mr-2" placeholder="Booking ID" />
-
+    <select name="SearchEventTypeName" class="form-control mr-2">
+        <option value="">Select Event Type</option>
+        @foreach (var eventType in Model.EventTypes)
+        {
+            <option value="@eventType.EventTypeID">@eventType.EventTypeName</option>
+        }
+    </select>
     <input type="date" name="StartDate" class="form-control mr-2" placeholder="Start Date" required />
     <input type="date" name="EndDate" class="form-control mr-2" placeholder="End Date" required />
-
     <button type="submit" class="btn btn-sm search-button">
         Check Availability
     </button>
@@ -57,7 +61,7 @@
                         @booking.Event?.EventName
                     </td>
                     <td>
-                        @booking.Event?.EventType.EventTypeName
+                        @booking.Event?.EventType?.EventTypeName
                     </td>
                     <td>
                         @booking.Venue?.VenueName

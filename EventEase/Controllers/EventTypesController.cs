@@ -46,6 +46,7 @@ namespace EventEase.Controllers
         // GET: EventTypes/Create
         public IActionResult Create()
         {
+            ViewData["EventTypeID"] = new SelectList(_context.EventType, "EventTypeID", "EventTypeName");
             return View();
         }
 
