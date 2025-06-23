@@ -35,9 +35,6 @@ namespace EventEase.Controllers
         {
             var query = _context.Booking.Include(e => e.Event).ThenInclude(et => et.EventType).Include(e => e.Venue).AsQueryable();
 
-            if (action == "search")
-            {
-
                 if (model.SearchBookingId.HasValue)
                 {
                     query = query.Where(e => e.BookingId >= model.SearchBookingId);
@@ -61,10 +58,7 @@ namespace EventEase.Controllers
                 {
                     query = query.Where(e => e.EndDate == model.EndDate.Value);
                 }
-            }
-
-            else if (action == "checkAvailability")
-            {
+         
                 //What's taken
                 var notAvailabileVenue = await _context.Booking
                        .Where(bk => (bk.StartDate <= model.EndDate && bk.EndDate >= model.StartDate))
@@ -77,8 +71,6 @@ namespace EventEase.Controllers
                     .ToListAsync();
 
                 model.AvailableVenues = availableVenues;
-                return View(model);
-            }
 
                 model.Bookings = await query.ToListAsync();
             // Populate EventTypes for the dropdown
