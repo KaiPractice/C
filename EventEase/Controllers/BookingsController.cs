@@ -31,48 +31,33 @@ namespace EventEase.Controllers
             return View(await bookings.ToListAsync());
         }
 
-        public async Task<IActionResult> CheckAvailability(string? searchEventName, int? searchBookingId, int? searchEventTypeId, DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> SearchBooking(SearchViewModel model)
         {
-            // Query to find venues that do not have bookings in the specified date range
-            var availableVenues = await _context.Venue
-                .Where(v => !_context.Booking.Any(b =>
-                    b.VenueId == v.VenueID &&
-                    ((startDate >= b.StartDate && startDate <= b.EndDate) ||
-                     (endDate >= b.StartDate && endDate <= b.EndDate) ||
-                     (startDate <= b.StartDate && endDate >= b.EndDate))))
-                .ToListAsync();
-
-            // Filter based on event name if provided
-            if (!string.IsNullOrEmpty(searchEventName))
+            var query = _context.Booking.Include(e => e.Event).ThenInclude(et => et.EventType).Include(e => e.Venue).AsQueryable();
+            
+            if (model.SearchBookingId.HasValue)
             {
-                availableVenues = availableVenues.Where(v => v.Bookings.Any(b => b.Event.EventName.Contains(searchEventName))).ToList();
+                query = query.Where(e => e.BookingId >= model.SearchBookingId);
             }
-
-            // Filter based on event name if provided
-            if (searchBookingId.HasValue)
+            if (!string.IsNullOrEmpty(model.SearchEventName))
             {
-                availableVenues = availableVenues.Where(v => v.Bookings.Any(b => b.BookingId == searchBookingId.Value)).ToList();
+                query = query.Where(e => e.Event.EventName.Contains(model.SearchEventName));
             }
-
-            // Filter based on event type if provided
-            if (searchEventTypeId.HasValue)
+            if (!string.IsNullOrEmpty(model.SearchEventTypeName))
             {
-                availableVenues = availableVenues.Where(v => v.Bookings.Any(b => b.Event.EventTypeID == searchEventTypeId.Value)).ToList();
+                query = query.Where(et => et.Event.EventType.EventTypeName.Contains(model.SearchEventTypeName));
             }
-
-            var model = new SearchViewModel
+            // Check if StartDate and EndDate are provided
+            if (model.StartDate.HasValue && model.EndDate.HasValue)
             {
-                Bookings = availableVenues.SelectMany(v => v.Bookings).ToList(),
-                EventTypes = await _context.EventType.ToListAsync(),
-                SearchEventName = searchEventName,
-                SearchBookingId = searchBookingId,
-                SearchEventType = searchEventTypeId,
-                StartDate = startDate,
-                EndDate = endDate
-            };
-
+                query = query.Where(e => e.StartDate >= model.StartDate.Value && e.EndDate <= model.EndDate.Value);
+            }
+            model.Bookings = await query.ToListAsync();
+            // Populate EventTypes for the dropdown
+            model.EventTypes = await _context.EventType.ToListAsync();
             return View(model);
         }
+
 
 
         // GET: Bookings/Details/5
@@ -134,27 +119,6 @@ namespace EventEase.Controllers
             ViewData["VenueId"] = new SelectList(_context.Venue, "VenueID", "VenueName", booking.VenueId);
             return View(booking);
         }
-
-
-        public async Task<IActionResult> SearchBooking(SearchViewModel model)
-        {
-            var query = _context.Booking.Include(e => e.Event).Include(e => e.Venue).AsQueryable();
-
-            if (model.SearchBookingId.HasValue)
-            {
-                query = query.Where(e => e.BookingId >= model.SearchBookingId);
-            }
-
-            if (!string.IsNullOrEmpty(model.SearchEventName))
-            {
-                query = query.Where(e => e.Event.EventName.Contains(model.SearchEventName));
-            }
-
-            model.Bookings = await query.ToListAsync();
-
-            return View(model);
-        }
-
 
 
         // GET: Bookings/Edit/5
