@@ -330,3 +330,4 @@ D:\Uni\source\CLDV\POE\Part 3\V2\EventEase\EventEase\obj\Debug\net9.0\ref\EventE
 D:\Uni\source\CLDV\POE\Part 3\V2\EventEase\EventEase\bin\Debug\net9.0\Azure.Storage.Blobs.dll
 D:\Uni\source\CLDV\POE\Part 3\V2\EventEase\EventEase\bin\Debug\net9.0\Azure.Storage.Common.dll
 D:\Uni\source\CLDV\POE\Part 3\V2\EventEase\EventEase\bin\Debug\net9.0\System.IO.Hashing.dll
+D:\Uni\source\CLDV\POE\Part 3\V2\EventEase\EventEase\obj\Debug\net9.0\EventEase.sourcelink.json

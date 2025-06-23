@@ -35,10 +35,13 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.FileDetails)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.ImageURL)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
+            <img src="@Html.DisplayFor(model => model.ImageURL)" style="max-width: 500px;" style="max-height: 300px;" />
+        </dd>
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.ImageURL)
         </dd>
     </dl>

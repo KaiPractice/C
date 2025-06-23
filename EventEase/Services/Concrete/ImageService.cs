@@ -45,5 +45,17 @@ namespace EventEase.Services.Concrete
 
             return blobClient.Uri.ToString();
         }
+
+        public void DeleteImageFromAzure(string imageUrl)
+        {
+            // Extract the blob name from the URL
+            var uri = new Uri(imageUrl);
+            var blobName = Path.GetFileName(uri.LocalPath);
+            BlobContainerClient blobContainerClient = new BlobContainerClient(
+                _azureOptions.ConnectionString,
+                _azureOptions.Container);
+            BlobClient blobClient = blobContainerClient.GetBlobClient(blobName);
+            blobClient.DeleteIfExists(); // Deletes the blob if it exists
+        }
     }
 }

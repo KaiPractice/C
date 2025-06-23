@@ -170,19 +170,20 @@ namespace EventEase.Controllers
         // POST: Venues/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id, string blob_name)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var venue = await _context.Venue.FindAsync(id);
-
             bool hasBooking = await _context.Booking.AnyAsync(gp => gp.VenueId == id);
-
-            if (hasBooking == true)
+            if (hasBooking)
             {
-                var Venue = await _context.Venue.FindAsync(id);
                 ModelState.AddModelError(string.Empty, "Cannot delete this venue, there is an existing booking in place");
                 return View(venue);
             }
-
+            // Delete the image from Azure Blob Storage
+            if (!string.IsNullOrEmpty(venue.ImageURL))
+            {
+                _imageService.DeleteImageFromAzure(venue.ImageURL);
+            }
             _context.Venue.Remove(venue);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
