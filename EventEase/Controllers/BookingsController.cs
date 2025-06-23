@@ -31,28 +31,56 @@ namespace EventEase.Controllers
             return View(await bookings.ToListAsync());
         }
 
-        public async Task<IActionResult> SearchBooking(SearchViewModel model)
+        public async Task<IActionResult> SearchBooking(SearchViewModel model, string action)
         {
             var query = _context.Booking.Include(e => e.Event).ThenInclude(et => et.EventType).Include(e => e.Venue).AsQueryable();
-            
-            if (model.SearchBookingId.HasValue)
+
+            if (action == "search")
             {
-                query = query.Where(e => e.BookingId >= model.SearchBookingId);
+
+                if (model.SearchBookingId.HasValue)
+                {
+                    query = query.Where(e => e.BookingId >= model.SearchBookingId);
+                }
+                if (!string.IsNullOrEmpty(model.SearchEventName))
+                {
+                    query = query.Where(e => e.Event.EventName.Contains(model.SearchEventName));
+                }
+                if (model.SearchEventTypeId.HasValue)
+                {
+                    query = query.Where(e => e.Event.EventTypeID == model.SearchEventTypeId.Value);
+                }
+                ViewBag.ListOfEventTypesInUse = new SelectList(await _context.EventType.ToListAsync(), "EventTypeID", "EventTypeName");
+
+                if (model.StartDate.HasValue)
+                {
+                    query = query.Where(e => e.StartDate == model.StartDate.Value);
+                }
+
+                if (model.EndDate.HasValue)
+                {
+                    query = query.Where(e => e.EndDate == model.EndDate.Value);
+                }
             }
-            if (!string.IsNullOrEmpty(model.SearchEventName))
+
+            else if (action == "checkAvailability")
             {
-                query = query.Where(e => e.Event.EventName.Contains(model.SearchEventName));
+                //What's taken
+                var notAvailabileVenue = await _context.Booking
+                       .Where(bk => (bk.StartDate <= model.EndDate && bk.EndDate >= model.StartDate))
+                       .Select(bk => bk.VenueId)
+                       .Distinct()
+                       .ToListAsync();
+                
+                var availableVenues = await _context.Venue
+                    .Where(ven => !notAvailabileVenue.Contains(ven.VenueID))
+                    .ToListAsync();
+
+                model.AvailableVenues = availableVenues;
+                return View(model);
             }
-            if (!string.IsNullOrEmpty(model.SearchEventTypeName))
-            {
-                query = query.Where(et => et.Event.EventType.EventTypeName.Contains(model.SearchEventTypeName));
-            }
-            // Check if StartDate and EndDate are provided
-            if (model.StartDate.HasValue && model.EndDate.HasValue)
-            {
-                query = query.Where(e => e.StartDate >= model.StartDate.Value && e.EndDate <= model.EndDate.Value);
-            }
-            model.Bookings = await query.ToListAsync();
+
+                model.Bookings = await query.ToListAsync();
             // Populate EventTypes for the dropdown
             model.EventTypes = await _context.EventType.ToListAsync();
             return View(model);

@@ -7,26 +7,56 @@
     <input type="text" name="SearchEventName" class="form-control mr-2" placeholder="Event Name" />
     <input type="number" name="SearchBookingId" class="form-control mr-2" placeholder="Booking ID" />
 
-    <select name="SearchEventType" class="form-control mr-2">
         <!-- Use SearchEventType -->
-        <option value="">Select Event Type</option>
-        @if (Model.EventTypes != null)
-        {
-            foreach (var eventType in Model.EventTypes)
-            {
-                <option value="@eventType.EventTypeID">@eventType.EventTypeName</option>
-            }
-        }
-    </select>
+        <select asp-for="SearchEventTypeId" class="form-control mr-2" asp-items="ViewBag.ListOfEventTypesInUse">
+            <option value="" disabled selected style="color: #999;">Please Select An Event </option>
+        </select>
 
     <input type="date" name="StartDate" class="form-control mr-2" placeholder="Start Date" />
     <input type="date" name="EndDate" class="form-control mr-2" placeholder="End Date"/>
 
-    <button type="submit" class="btn btn-sm search-button">
+    <button type="submit" name="action" value="search" class="btn btn-sm search-button mr-2">
         Search
+    </button>
+
+    <button type="submit" name="action" value="checkAvailability" class="btn btn-sm btn-primary">
+        Check Availability
+    </button>
+
+    <button type="reset" class="btn btn-sm btn-secondary">
+        Reset
     </button>
 </form>
 
+@if (Model.AvailableVenues != null && Model.AvailableVenues.Any())
+{
+    <h3>Available Venues</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Venue Name</th>
+                <th>Location</th>
+                <th>Capacity</th>
+                <th>Image</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var venue in Model.AvailableVenues)
+            {
+                <tr>
+                    <td>@venue.VenueName</td>
+                    <td>@venue.Location</td>
+                    <td>@venue.Capacity</td>
+                    <td><img src="@Html.DisplayFor(m => venue.ImageURL)" style="max-width: 500px; max-height: 300px;" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p class="text-danger">No venues available for the selected criteria.</p>
+}
 
 
 @if (Model.Bookings != null && Model.Bookings.Any())
